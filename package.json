@@ -1,0 +1,68 @@
+{
+  "name": "koishi-plugin-foxy-daily",
+  "version": "0.2.3",
+  "description": "LivingMemory-backed Qzone daily posts, nested comments, auto-like and public-feed tools for ChatLuna / Character.",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "author": "Kun-Fox",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kun-Fox/koishi-plugin-foxy-daily.git"
+  },
+  "homepage": "https://github.com/Kun-Fox/koishi-plugin-foxy-daily#readme",
+  "bugs": {
+    "url": "https://github.com/Kun-Fox/koishi-plugin-foxy-daily/issues"
+  },
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "koishi-plugin",
+    "chatluna",
+    "livingmemory",
+    "qzone",
+    "qq"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "dependencies": {
+    "@langchain/core": "^0.3.80",
+    "qzone-sdk": "^0.3.3",
+    "zod": "3.25.76"
+  },
+  "peerDependencies": {
+    "koishi": "^4.18.0",
+    "koishi-plugin-chatluna": "^1.4.0",
+    "koishi-plugin-chatluna-livingmemory": ">=0.15.0"
+  },
+  "peerDependenciesMeta": {
+    "koishi-plugin-chatluna": {
+      "optional": true
+    },
+    "koishi-plugin-chatluna-livingmemory": {
+      "optional": true
+    }
+  },
+  "koishi": {
+    "description": {
+      "zh": "基于 LivingMemory 的 QQ 空间每日动态：定时/手动/区间发布、楼中楼与白名单评论、自动点赞、空友爱看，并注册 ChatLuna 与 Character 工具。",
+      "en": "LivingMemory-backed Qzone daily posts with nested comments, auto-like, public feed and ChatLuna/Character tools."
+    },
+    "service": {
+      "optional": [
+        "chatluna",
+        "chatluna_living_memory",
+        "chatluna_character",
+        "chatluna_memes"
+      ]
+    }
+  },
+  "scripts": {
+    "test": "node test/test-daily.cjs"
+  }
+}
