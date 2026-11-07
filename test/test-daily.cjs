@@ -7,7 +7,7 @@ const path = require('node:path')
 
 const { JsonState } = require('../lib/state')
 const { buildWindow, filterMemories, generateDigest, dateKey } = require('../lib/digest')
-const { CommentRunner } = require('../lib/comments')
+const { CommentRunner, commentKey } = require('../lib/comments')
 const { LikeRunner } = require('../lib/likes')
 const { PublicFeedRunner, feedKey } = require('../lib/public-feed')
 const { parseCookieHeader, extractUin, hasQzoneTicket, normalizeImages } = require('../lib/qzone')
@@ -147,11 +147,70 @@ async function main() {
     const report = await runner.runOnce()
     assert.equal(report.replied, 1)
     assert.equal(replies, 1)
-    assert.equal(state.commentState('p1', 'c1').status, 'replied')
+    assert.equal(state.commentState('p1', commentKey(posts[0].comments[0])).status, 'replied')
     assert.equal(state.commentState('p1', 'old').status, 'replied')
     const again = await runner.runOnce()
     assert.equal(again.replied, 0)
     assert.equal(replies, 1)
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
+
+  await test('CommentRunner separates comments that share the same numeric id', async () => {
+    const dir = tempDir()
+    const state = new JsonState(path.join(dir, 'state.json'))
+    await state.load()
+    // Legacy state from the old implementation only had the raw comment id.
+    state.setCommentState('p1', '2', { status: 'replied', reply: '旧回复' })
+    const comments = [
+      {
+        id: '2',
+        kind: 'reply',
+        author: { id: 'u1', nickname: 'nogitsune' },
+        content: '不是我考',
+        replyToUser: { id: 'bot', nickname: 'Foxy' },
+        createdAt: new Date(),
+      },
+      {
+        id: '2',
+        kind: 'comment',
+        author: { id: 'u2', nickname: '筱柒' },
+        content: '强强',
+        createdAt: new Date(),
+      },
+    ]
+    assert.notEqual(commentKey(comments[0]), commentKey(comments[1]))
+    const qzone = {
+      accountId: 'bot',
+      async listSelfFeeds() { return { items: [{ id: 'p1' }] } },
+      async getPost() {
+        return { id: 'p1', authorId: 'bot', content: '动态', comments }
+      },
+      async reply(_post, comment) {
+        return { outcome: 'verified', repliedTo: comment.content }
+      },
+    }
+    const runner = new CommentRunner({
+      qzone,
+      state,
+      config: {
+        enableCommentAutoReply: true,
+        monitorPostLimit: 10,
+        commentMaxAgeHours: 72,
+        commentMaxRepliesPerRound: 3,
+        commentMaxAttempts: 3,
+        autoReplyAllCommenters: true,
+      },
+      logger: { info() {}, warn() {} },
+      getModel: async () => ({ invoke: async () => ({ content: '回复' }) }),
+      getPersona: async () => '',
+    })
+    const pending = await runner.listUnreplied()
+    assert.match(pending, /强强/)
+    assert.doesNotMatch(pending, /不是我考/)
+    const report = await runner.runOnce()
+    assert.equal(report.replied, 1)
+    assert.equal(state.commentState('p1', commentKey(comments[1])).status, 'replied')
+    assert.equal(state.commentState('p1', commentKey(comments[0])), undefined)
     fs.rmSync(dir, { recursive: true, force: true })
   })
 
