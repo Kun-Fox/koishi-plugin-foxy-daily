@@ -214,6 +214,48 @@ async function main() {
     fs.rmSync(dir, { recursive: true, force: true })
   })
 
+  await test('CommentRunner does not assign legacy state to Foxy own reply', async () => {
+    const dir = tempDir()
+    const state = new JsonState(path.join(dir, 'state.json'))
+    await state.load()
+    state.setCommentState('p1', '1', { status: 'replied', reply: '考完记得补觉喵' })
+    const comments = [
+      {
+        id: '1',
+        kind: 'comment',
+        author: { id: 'u1', nickname: 'nogitsune' },
+        content: '😄',
+        createdAt: new Date(),
+      },
+      {
+        id: '1',
+        kind: 'reply',
+        author: { id: 'bot', nickname: 'Ai Foxy' },
+        content: '考完记得补觉喵',
+        replyToUser: { id: 'u1', nickname: 'nogitsune' },
+        createdAt: new Date(),
+      },
+    ]
+    const qzone = {
+      accountId: 'bot',
+      async listSelfFeeds() { return { items: [{ id: 'p1' }] } },
+      async getPost() {
+        return { id: 'p1', authorId: 'bot', content: '动态', comments }
+      },
+    }
+    const runner = new CommentRunner({
+      qzone,
+      state,
+      config: { commentMaxAgeHours: 72, commentMaxAttempts: 3, autoReplyAllCommenters: true },
+      logger: { info() {}, warn() {} },
+      getModel: async () => ({ invoke: async () => ({ content: '回复' }) }),
+      getPersona: async () => '',
+    })
+    assert.equal(runner._commentState({ id: 'p1' }, comments[0], comments)?.status, 'replied')
+    assert.equal(runner._commentState({ id: 'p1' }, comments[1], comments), undefined)
+    fs.rmSync(dir, { recursive: true, force: true })
+  })
+
   await test('CommentRunner respects allow list when autoReplyAllCommenters is false', async () => {
     const dir = tempDir()
     const state = new JsonState(path.join(dir, 'state.json'))
