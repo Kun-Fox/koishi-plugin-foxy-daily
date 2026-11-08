@@ -33,7 +33,7 @@ npm install koishi-plugin-foxy-daily
 
 安装后在 Koishi 控制台启用，至少填写 `allowUserIds`，并从下拉框选择 `digestModel` 与 `personaPresetId`。
 
-模型下拉来自 ChatLuna 的 `modelSchema`；ChatLuna 预设下拉来自 ChatLuna 的 `preset` schema，Character 预设下拉来自 `chatluna-character` 的 `character-preset` schema。三个列表都由对应插件维护，本插件只引用，不需要手填模型名或预设名。若对应服务未安装，配置会退化为 `foxy3` / 空模型。
+模型下拉来自 ChatLuna 的 `modelSchema`；ChatLuna 预设下拉来自 ChatLuna 的 `preset` schema，Character 预设下拉来自 `chatluna-character` 的 `character-preset` schema。三个列表都由对应插件维护，本插件只引用，不需要手填模型名或预设名。若对应服务未安装，配置会退化为 `preset` / 空模型。
 
 ## 配置
 
@@ -55,9 +55,10 @@ npm install koishi-plugin-foxy-daily
 | `enableDailyDigest` | `true` | 开启每日动态 |
 | `digestTime` | `23:50` | 每日触发时间，服务器本地时区 |
 | `digestMemoryLimit` | `100` | 单次使用的记忆条数上限 |
+| `digestPrompt` | 空 | 追加到每日动态提示词后的自定义要求；留空使用内置 |
 | `personaKind` | `character` | 使用哪套预设：`character` 用 Character 伪装插件预设，`chatluna` 用 ChatLuna 主插件预设 |
-| `personaPresetId` | `foxy3` | ChatLuna 主插件预设，下拉来自 ChatLuna 的 `preset` schema |
-| `characterPresetId` | `foxy3` | Character 伪装插件预设，下拉来自 `chatluna-character` 的 `character-preset` schema |
+| `personaPresetId` | `preset` | ChatLuna 主插件预设，下拉来自 ChatLuna 的 `preset` schema |
+| `characterPresetId` | `preset` | Character 伪装插件预设，下拉来自 `chatluna-character` 的 `character-preset` schema |
 | `persona` | 空 | LivingMemory 不可用时的备用人设 |
 | `digestModel` | 空 | 下拉自动列出 ChatLuna 模型；也可手填 `deepseek/deepseek-flash` |
 | `catchUpPreviousDay` | `true` | 06:00 前补发前一天 |
@@ -144,7 +145,7 @@ chatluna-character 的 reply 字段同名，均为数组；模型填数组，插
 
 - 每日默认窗口：当天 00:00 到当前时间；06:00 前自动改为前一天。
 - 手动单日取该日 00:00–23:59；手动区间会合并两天的记忆。
-- 只读取 `personaPresetId` 下 `status=active` 的记忆，按 `createdAt` 过滤；`personaKind=character` 时会自动拼成 `foxy3（Character）`，不会误读主插件记忆。不会改 LivingMemory 的向量索引。
+- 只读取 `personaPresetId` 下 `status=active` 的记忆，按 `createdAt` 过滤；`personaKind=character` 时会自动拼成 `preset（Character）`，不会误读主插件记忆。不会改 LivingMemory 的向量索引。
 - 发布成功后 `published[date]` 阻止重复发布；模型跳过时写 `skipped[date]`。
 - 发布失败写 `pending`，5 分钟起指数退避，封顶 6 小时；进程重启后继续。
 - `unknown` 结果先读自己的最近动态，按正文精确匹配；确认存在则记为已发布，不直接重发。
@@ -198,7 +199,7 @@ maxImages: 9
 npm test
 ```
 
-当前 20 个用例通过：窗口计算、日期区间、记忆过滤、状态持久化、Cookie 解析、评论筛选/楼中楼/他人动态、点赞白黑名单、空友爱看、Character 预设后缀、chatlunamemes 配图、摘要工具校验、配图归一化、发布成功/失败/unknown、动态配置默认值、daily 指令注册与帮助列表。
+当前 22 个用例通过：窗口计算、日期区间、记忆过滤、状态持久化、Cookie 解析、评论筛选/楼中楼/他人动态、点赞白黑名单、空友爱看、Character 预设后缀、chatlunamemes 配图、摘要工具校验、配图归一化、发布成功/失败/unknown、动态配置默认值、daily 指令注册与帮助列表，以及重复评论 id/旧状态归属。
 
 ## License
 
