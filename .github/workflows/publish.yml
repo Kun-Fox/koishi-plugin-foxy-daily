@@ -15,29 +15,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: 'https://registry.npmjs.org'
-
       - name: Install dependencies
         run: npm install --no-audit --no-fund
-
-      - name: Check published version
-        id: published
+      - name: Publish if missing
         run: |
           NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
           if npm view "$NAME@$VERSION" version >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
             echo "$NAME@$VERSION already exists; skipping publish."
           else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
+            npm publish --provenance --access public
           fi
-
-      - name: Publish
-        if: steps.published.outputs.exists != 'true'
-        run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
