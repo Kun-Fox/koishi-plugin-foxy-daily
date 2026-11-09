@@ -6,7 +6,7 @@ const os = require('node:os')
 const path = require('node:path')
 
 const { JsonState } = require('../lib/state')
-const { buildWindow, filterMemories, generateDigest, dateKey } = require('../lib/digest')
+const { DEFAULT_DIGEST_PROMPT, buildDigestPrompts, buildWindow, filterMemories, generateDigest, dateKey } = require('../lib/digest')
 const { CommentRunner, commentKey } = require('../lib/comments')
 const { LikeRunner } = require('../lib/likes')
 const { PublicFeedRunner, feedKey } = require('../lib/public-feed')
@@ -72,6 +72,28 @@ async function main() {
       memory('d', 'bad', 'not-a-date'),
     ]
     assert.deepEqual(filterMemories(entries, start, end).map((entry) => entry.id), ['b'])
+  })
+
+  await test('digest prompt defaults to the built-in editable task', () => {
+    assert.ok(DEFAULT_DIGEST_PROMPT.includes('第一人称的 QQ 空间动态'))
+    const defaults = buildDigestPrompts({
+      persona: 'foxy persona',
+      customPrompt: '',
+      windowLabel: '2026-11-09 00:00–23:59',
+      memoryCount: 3,
+    })
+    assert.ok(defaults.systemPrompt.includes(DEFAULT_DIGEST_PROMPT))
+    assert.ok(defaults.systemPrompt.includes('<output_contract>'))
+
+    const custom = buildDigestPrompts({
+      persona: 'foxy persona',
+      customPrompt: '只写一句短动态。',
+      windowLabel: '2026-11-09 00:00–23:59',
+      memoryCount: 3,
+    })
+    assert.ok(custom.systemPrompt.includes('只写一句短动态。'))
+    assert.ok(!custom.systemPrompt.includes(DEFAULT_DIGEST_PROMPT))
+    assert.ok(custom.systemPrompt.includes('<output_contract>'))
   })
 
   await test('JsonState persists, marks and is idempotent', async () => {
