@@ -633,6 +633,7 @@ async function main() {
 
   await test('Config defaults keep auto-pulled model/preset fields empty', () => {
     const config = Config({})
+    assert.equal(config.memoryBackend, 'auto')
     assert.equal(config.personaPresetId, 'foxy3')
     assert.equal(config.characterPresetId, 'foxy3')
     assert.equal(config.digestModel, '')

@@ -1,6 +1,6 @@
 # koishi-plugin-foxy-daily
 
-基于 **Foxy Memory** 的 QQ 空间每日动态插件：从记忆生成动态、定时或手动发布、读取评论、自动或手动回复评论，并把「发动态、读评论、回复评论」注册成 ChatLuna 工具与 chatluna-character 的 reply 字段。
+基于 **Foxy Memory** 或 **LivingMemory** 的 QQ 空间每日动态插件：从记忆生成动态、定时或手动发布、读取评论、自动或手动回复评论，并把「发动态、读评论、回复评论」注册成 ChatLuna 工具与 chatluna-character 的 reply 字段。
 
 每日动态与记忆窗口的思路参考了 `koishi-plugin-chatluna-livingdiary`；本插件是独立实现，不修改 `livingdiary` 或 `qzone`。感谢原作者。
 
@@ -21,7 +21,8 @@
 
 - Koishi `^4.18`
 - `koishi-plugin-chatluna`（生成动态/回复；可选安装，但启用每日动态时需要）
-- `koishi-plugin-chatluna-foxy-memory`（读取记忆与人设）
+- `koishi-plugin-chatluna-foxy-memory`（新版 Foxy 记忆，读取记忆与人设）
+- `koishi-plugin-chatluna-livingmemory`（旧版 LivingMemory，读取记忆与人设）
 - 一个能提供 QQ 空间 Cookie 的协议端：OneBot 11 / NapCat（`get_cookies`）或 Milky（`.cookies`）
 - `qzone-sdk@^0.3.3`（插件依赖）
 
@@ -59,7 +60,8 @@ npm install koishi-plugin-foxy-daily
 | `personaKind` | `character` | 使用哪套预设：`character` 用 Character 伪装插件预设，`chatluna` 用 ChatLuna 主插件预设 |
 | `personaPresetId` | `preset` | ChatLuna 主插件预设，下拉来自 ChatLuna 的 `preset` schema |
 | `characterPresetId` | `preset` | Character 伪装插件预设，下拉来自 `chatluna-character` 的 `character-preset` schema |
-| `persona` | 空 | Foxy Memory 不可用时的备用人设 |
+| `memoryBackend` | `auto` | 记忆后端：`auto` 优先 Foxy Memory、回退 LivingMemory；也可显式选 `foxy-memory` 或 `livingmemory` |
+| `persona` | 空 | 记忆服务不可用时的备用人设 |
 | `digestModel` | 空 | 下拉自动列出 ChatLuna 模型；也可手填 `deepseek/deepseek-flash` |
 | `catchUpPreviousDay` | `true` | 06:00 前补发前一天 |
 
