@@ -1,12 +1,12 @@
 # koishi-plugin-foxy-daily
 
-基于 **LivingMemory** 的 QQ 空间每日动态插件：从记忆生成动态、定时或手动发布、读取评论、自动或手动回复评论，并把「发动态、读评论、回复评论」注册成 ChatLuna 工具与 chatluna-character 的 reply 字段。
+基于 **Foxy Memory** 的 QQ 空间每日动态插件：从记忆生成动态、定时或手动发布、读取评论、自动或手动回复评论，并把「发动态、读评论、回复评论」注册成 ChatLuna 工具与 chatluna-character 的 reply 字段。
 
 每日动态与记忆窗口的思路参考了 `koishi-plugin-chatluna-livingdiary`；本插件是独立实现，不修改 `livingdiary` 或 `qzone`。感谢原作者。
 
 ## 功能
 
-- 从 LivingMemory 读取指定 `presetId` 的记忆，生成每日动态。
+- 从 Foxy Memory 读取指定 `presetId` 的记忆，生成每日动态。
 - 支持定时发布、06:00 前补发前一天、手动指定单日或日期区间。
 - 发布失败写入状态文件，指数退避重试；`unknown` 先读回确认，避免重复动态。
 - 自动读取并回复机器人自己动态下的评论和楼中楼。
@@ -21,7 +21,7 @@
 
 - Koishi `^4.18`
 - `koishi-plugin-chatluna`（生成动态/回复；可选安装，但启用每日动态时需要）
-- `koishi-plugin-chatluna-livingmemory`（读取记忆与人设）
+- `koishi-plugin-chatluna-foxy-memory`（读取记忆与人设）
 - 一个能提供 QQ 空间 Cookie 的协议端：OneBot 11 / NapCat（`get_cookies`）或 Milky（`.cookies`）
 - `qzone-sdk@^0.3.3`（插件依赖）
 
@@ -59,7 +59,7 @@ npm install koishi-plugin-foxy-daily
 | `personaKind` | `character` | 使用哪套预设：`character` 用 Character 伪装插件预设，`chatluna` 用 ChatLuna 主插件预设 |
 | `personaPresetId` | `preset` | ChatLuna 主插件预设，下拉来自 ChatLuna 的 `preset` schema |
 | `characterPresetId` | `preset` | Character 伪装插件预设，下拉来自 `chatluna-character` 的 `character-preset` schema |
-| `persona` | 空 | LivingMemory 不可用时的备用人设 |
+| `persona` | 空 | Foxy Memory 不可用时的备用人设 |
 | `digestModel` | 空 | 下拉自动列出 ChatLuna 模型；也可手填 `deepseek/deepseek-flash` |
 | `catchUpPreviousDay` | `true` | 06:00 前补发前一天 |
 
@@ -135,7 +135,7 @@ npm install koishi-plugin-foxy-daily
 
 ## ChatLuna / Character 工具
 
-- `qzone_publish`：`{ content?, date? }`；`content` 为空时从 LivingMemory 生成。
+- `qzone_publish`：`{ content?, date? }`；`content` 为空时从 Foxy Memory 生成。
 - `qzone_comments`：`{ post_id? }`；读取评论。
 - `qzone_reply`：`{ post_id, comment_id, content }`；回复评论。
 
@@ -145,7 +145,7 @@ chatluna-character 的 reply 字段同名，均为数组；模型填数组，插
 
 - 每日默认窗口：当天 00:00 到当前时间；06:00 前自动改为前一天。
 - 手动单日取该日 00:00–23:59；手动区间会合并两天的记忆。
-- 只读取 `personaPresetId` 下 `status=active` 的记忆，按 `createdAt` 过滤；`personaKind=character` 时会自动拼成 `preset（Character）`，不会误读主插件记忆。不会改 LivingMemory 的向量索引。
+- 只读取 `personaPresetId` 下 `status=active` 的记忆，按 `createdAt` 过滤；`personaKind=character` 时会自动拼成 `preset（Character）`，不会误读主插件记忆。不会改 Foxy Memory 的向量索引。
 - 发布成功后 `published[date]` 阻止重复发布；模型跳过时写 `skipped[date]`。
 - 发布失败写 `pending`，5 分钟起指数退避，封顶 6 小时；进程重启后继续。
 - `unknown` 结果先读自己的最近动态，按正文精确匹配；确认存在则记为已发布，不直接重发。
