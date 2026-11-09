@@ -56,7 +56,7 @@ npm install koishi-plugin-foxy-daily
 | `enableDailyDigest` | `true` | 开启每日动态 |
 | `digestTime` | `23:50` | 每日触发时间，服务器本地时区 |
 | `digestMemoryLimit` | `100` | 单次使用的记忆条数上限 |
-| `digestPrompt` | 空 | 追加到每日动态提示词后的自定义要求；留空使用内置 |
+| `digestPrompt` | 空 | 发动态提示词；留空使用内置任务说明，填写后覆盖内置任务说明 |
 | `personaKind` | `character` | 使用哪套预设：`character` 用 Character 伪装插件预设，`chatluna` 用 ChatLuna 主插件预设 |
 | `personaPresetId` | `preset` | ChatLuna 主插件预设，下拉来自 ChatLuna 的 `preset` schema |
 | `characterPresetId` | `preset` | Character 伪装插件预设，下拉来自 `chatluna-character` 的 `character-preset` schema |
