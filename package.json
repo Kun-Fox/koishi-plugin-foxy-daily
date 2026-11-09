@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-foxy-daily",
-  "version": "0.2.12",
+  "version": "0.2.13",
   "description": "Foxy Memory / LivingMemory-backed Qzone daily posts, nested comments, auto-like and public-feed tools for ChatLuna / Character.",
   "main": "lib/index.js",
   "files": [
